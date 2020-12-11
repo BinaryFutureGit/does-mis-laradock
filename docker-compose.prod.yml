@@ -1,10 +1,10 @@
 version: "3"
 
-networks:
-  frontend:
-    driver: ${NETWORKS_DRIVER}
-  backend:
-    driver: ${NETWORKS_DRIVER}
+# networks:
+#   frontend:
+#     driver: ${NETWORKS_DRIVER}
+#   backend:
+#     driver: ${NETWORKS_DRIVER}
 
 volumes:
   mysql:
@@ -131,11 +131,12 @@ services:
       - DOCKER_TLS_VERIFY=1
       - DOCKER_TLS_CERTDIR=/certs
       - DOCKER_CERT_PATH=/certs/client
-    networks:
-      - frontend
-      - backend
-    links:
-      - docker-in-docker
+    network_mode: "host"
+    # networks:
+    # - frontend
+    # - backend
+    # links:
+    #   - docker-in-docker
 
   ### PHP-FPM ##############################################
   php-fpm:
@@ -226,10 +227,11 @@ services:
       - FAKETIME=${PHP_FPM_FAKETIME}
     depends_on:
       - workspace
-    networks:
-      - backend
-    links:
-      - docker-in-docker
+    network_mode: "host"
+    # networks:
+    #   - backend
+    # links:
+    #   - docker-in-docker
 
   ### PHP Worker ############################################
   php-worker:
@@ -271,8 +273,9 @@ services:
       - workspace
     extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
-    networks:
-      - backend
+    network_mode: "host"
+    # networks:
+    #   - backend
 
   ### NGINX Server #########################################
   nginx:
@@ -296,9 +299,10 @@ services:
       - "${NGINX_HOST_HTTPS_PORT}:443"
     depends_on:
       - php-fpm
-    networks:
-      - frontend
-      - backend
+    network_mode: "host"
+    # networks:
+    # - frontend
+    # - backend
 
   ### MySQL ################################################
   mysql:
@@ -318,20 +322,22 @@ services:
       - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
     ports:
       - "${MYSQL_PORT}:3306"
-    networks:
-      - backend
+    network_mode: "host"
+    # networks:
+    #   - backend
 
   ### Docker-in-Docker ################################################
-  docker-in-docker:
-    image: docker:19.03-dind
-    restart: unless-stopped
-    environment:
-      DOCKER_TLS_SAN: DNS:docker-in-docker
-    privileged: true
-    volumes:
-      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-      - docker-in-docker:/certs/client
-    expose:
-      - 2375
-    networks:
-      - backend
+  # docker-in-docker:
+  #   image: docker:19.03-dind
+  #   restart: unless-stopped
+  #   environment:
+  #     DOCKER_TLS_SAN: DNS:docker-in-docker
+  #   privileged: true
+  #   volumes:
+  #     - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+  #     - docker-in-docker:/certs/client
+  #   expose:
+  #     - 2375
+  #   network_mode: "host"
+  # networks:
+  #   - backend
