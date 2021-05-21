@@ -422,6 +422,17 @@ RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
   php -m | grep -r 'memcached'; \
   fi
 
+###########################################################################
+# Exif:
+###########################################################################
+
+ARG INSTALL_EXIF=false
+
+RUN if [ ${INSTALL_EXIF} = true ]; then \
+  # Enable Exif PHP extentions requirements
+  docker-php-ext-install exif \
+  ;fi
+
 #
 #--------------------------------------------------------------------------
 # Optional Supervisord Configuration
